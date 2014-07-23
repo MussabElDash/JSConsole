@@ -10,8 +10,11 @@
 		<script src="JSConsole.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var jsconsole = JSConsole("console");
-			jsconsole.addCommand("Hello", function(name){
+			jsconsole.addCommand("greet", function(name){
 				console.log("Hello " + name);
+				this.addOutput("Hello " + name);
+				this.addError("Hello " + name);
+				this.addWarning("Hello " + name);
 			});
 		</script>
 	</footer>

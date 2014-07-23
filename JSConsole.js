@@ -16,8 +16,6 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 					// tab
 					case 9:
 						e.preventDefault();
-						// $(this).text($(this).text() + "\t");
-						// setEndOfContenteditable(this);
 						break;
 					// enter
 					case 13:
@@ -74,28 +72,29 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 			commands[name] = fn;
 		}
 
-		// function setEndOfContenteditable(contentEditableElement)
-		// {
-		// 	var range,selection;
-		// 	if(document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
-		// 	{
-		// 		range = document.createRange();//Create a range (a range is a like the selection but invisible)
-		// 		range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
-		// 		range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
-		// 		selection = window.getSelection();//get the selection object (allows you to change selection)
-		// 		selection.removeAllRanges();//remove any selections already made
-		// 		selection.addRange(range);//make the range you have just created the visible selection
-		// 	}
-		// 	else if(document.selection)//IE 8 and lower
-		// 	{ 
-		// 		range = document.body.createTextRange();//Create a range (a range is a like the selection but invisible)
-		// 		range.moveToElementText(contentEditableElement);//Select the entire contents of the element with the range
-		// 		range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
-		// 		range.select();//Select the range (make it the visible selection
-		// 	}
-		// }
+		this.addOutput = function(text){
+			var $output = $("<div class='jsconsole_output'></div>");
+			$output.text(text);
+			$ConsoleElement.append($output);
+		}
+
+		this.addError = function(text){
+			var $output = $("<div class='jsconsole_error'></div>");
+			$output.text(text);
+			$ConsoleElement.append($output);
+		}
+
+
+		this.addWarning = function(text){
+			var $output = $("<div class='jsconsole_warning'></div>");
+			$output.text(text);
+			$ConsoleElement.append($output);
+		}
 
 		addLine();
+		this.addCommand("clear", function(){
+			$ConsoleElement.children(":not(.jsconsole_input.jsconsole_active)").remove();
+		});
 	}
 
 	var styles = function(background_color, input_color, output_color, error_color, warning_color, dir_color){
@@ -152,7 +151,7 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 		}
 
 		var output = function(){
-			var styleText = ".jsconsole_output{";
+			var styleText = ".jsconsole_output, .jsconsole_error, .jsconsole_warning{";
 			styleText += "display:block;";
 			styleText += "color:" + output_color + ";";
 			styleText += "border:none;";
@@ -165,12 +164,14 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 
 		var error = function(){
 			var styleText = ".jsconsole_error{";
-			styleText += "display:block;";
 			styleText += "color:" + error_color + ";";
-			styleText += "border:none;";
-			styleText += "outline:0;";
-			styleText += "word-wrap:break-word;";
-			styleText += "white-space:pre-wrap;";
+			styleText += "}";
+			$style.append(styleText);
+		}
+
+		var warning = function(){
+			var styleText = ".jsconsole_warning{";
+			styleText += "color:" + warning_color + ";";
 			styleText += "}";
 			$style.append(styleText);
 		}
@@ -180,6 +181,9 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 		cosole();
 		dir();
 		line();
+		output();
+		error();
+		warning();
 		$("head").append($style);
 	}
 
