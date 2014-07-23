@@ -33,6 +33,8 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 				children(".jsconsole_input.jsconsole_active").
 				children(".jsconsole_line");
 			$toBeFocused.focus();
+		}).on("contextmenu", function(e){
+			return false;
 		});
 
 		var addLine = function(){
