@@ -19,6 +19,7 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 		var historyIndex = 0;
 		var currentIndex = null;
 		var contextThis = this;
+		var directory = "JSConsole:~";
 
 		$ConsoleElement.on({
 			keydown: function(e){
@@ -95,7 +96,7 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 			$ConsoleElement.children(".jsconsole_input.jsconsole_active").
 				removeClass("jsconsole_active").children(".jsconsole_line").
 				removeAttr("contenteditable");
-			var $dir = $("<span class='jsconsole_directory'>JSConsole:~$</span>");
+			var $dir = $("<span class='jsconsole_directory'>" + directory + "$</span>");
 			var $line = $("<div class='jsconsole_line' contenteditable></div>");
 			var $active = $("<div class='jsconsole_input jsconsole_active'></div>").
 				append($dir).append($line);
@@ -209,6 +210,13 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 					which: 13
 				});
 			});
+		}
+
+		this.directory = function(dir){
+			if(dir === undefined)
+				return directory;
+			directory = dir;
+			return this;
 		}
 
 		function setEndOfContenteditable(contentEditableElement){
