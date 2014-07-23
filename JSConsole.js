@@ -275,7 +275,6 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 			var styleText = ".jsconsole_directory{";
 			styleText += "color:" + dir_color + ";";
 			styleText += "padding-right:8px;";
-			// styleText += "padding-left:4px;";
 			styleText += "display:inline;"
 			styleText += "}";
 			$style.append(styleText);
