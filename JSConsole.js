@@ -93,7 +93,8 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 
 		addLine();
 		this.addCommand("clear", function(){
-			$ConsoleElement.children(":not(.jsconsole_input.jsconsole_active)").remove();
+			// $ConsoleElement.children(":not(.jsconsole_input.jsconsole_active)").remove();
+			$ConsoleElement.children().remove();
 		});
 	}
 
