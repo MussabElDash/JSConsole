@@ -9,7 +9,10 @@
 		<script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
 		<script src="JSConsole.js" type="text/javascript"></script>
 		<script type="text/javascript">
-			JSConsole("console");
+			var jsconsole = JSConsole("console");
+			jsconsole.addCommand("Hello", function(name){
+				console.log("Hello " + name);
+			});
 		</script>
 	</footer>
 </html>
