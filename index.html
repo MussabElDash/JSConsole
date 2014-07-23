@@ -1,6 +1,5 @@
 <html>
 	<head>
-		<!-- <link rel="stylesheet" type="text/css" href="JSConsole.css"> -->
 	</head>
 	<body>
 		<div id="console"></div>
@@ -11,11 +10,17 @@
 		<script type="text/javascript">
 			var jsconsole = JSConsole("console");
 			jsconsole.addCommand("greet", function(name){
-				console.log("Hello " + name);
 				this.addOutput("Hello " + name);
 				this.addError("Hello " + name);
 				this.addWarning("Hello " + name);
 			});
+
+			jsconsole.addCommand("background", function(color){
+				this.backgroundColor(color).applyColorChanges();
+			});
+
+			jsconsole.executeCommands("greet Mussab",
+				"greet Mussab ElDash", "greet GitHub user");
 		</script>
 	</footer>
 </html>

@@ -1,6 +1,13 @@
 if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery') }
 (function ($, window, undefined) {
 
+	var background_color = "#2f0b24";
+	var input_color = "white";
+	var output_color = "green";
+	var error_color = "red";
+	var warning_color = "orange";
+	var dir_color = "blue";
+
 	window.JSConsole = function(ConsoleElementId){
 		if( !(this instanceof JSConsole) )
 			return new JSConsole(ConsoleElementId);
@@ -8,6 +15,9 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 		var $ConsoleElement = $("#" + ConsoleElementId).addClass("jsconsole");
 		$ConsoleElement.attr("tabindex", 0);
 		var commands = {};
+		var history = [];
+		var historyIndex = 0;
+		var currentIndex = null;
 		var contextThis = this;
 
 		$ConsoleElement.on({
@@ -23,12 +33,50 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 						commandsHandler();
 						addLine();
 						break;
+					// up
+					case 38:
+						e.preventDefault();
+						if(historyIndex === 0 && currentIndex === null)
+							currentIndex = $(this).text();
+						historyIndex += 1;
+						if(historyIndex > history.length){
+							historyIndex = history.length;
+							return;
+						}
+						if(historyIndex === 0 && currentIndex != null){
+							$(this).text(currentIndex);
+							setEndOfContenteditable(this);
+							return;
+						}
+						$(this).text(history[historyIndex - 1]);
+						setEndOfContenteditable(this);
+						break;
+					// down
+					case 40:
+						e.preventDefault();
+						if(historyIndex === 0 && currentIndex === null)
+							currentIndex = $(this).text();
+						historyIndex -= 1;
+						if(historyIndex < 0){
+							historyIndex = 0;
+							return;
+						}
+						if(historyIndex === 0 && currentIndex != null){
+							$(this).text(currentIndex);
+							setEndOfContenteditable(this);
+							return;
+						}
+						$(this).text(history[historyIndex - 1]);
+						setEndOfContenteditable(this);
+						break;
+					default:
+						break;
 				}
 			}
 		}, ".jsconsole_input.jsconsole_active .jsconsole_line");
 
 		$ConsoleElement.click(function(e){
-			if($(e.target).is(".jsconsole_input:not(.jsconsole_active) .jsconsole_line"))
+			if($(e.target).is(".jsconsole .jsconsole_line"))
 				return;
 			var $toBeFocused = $ConsoleElement.
 				children(".jsconsole_input.jsconsole_active").
@@ -36,6 +84,11 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 			$toBeFocused.focus();
 		}).on("contextmenu", function(e){
 			return false;
+		}).keypress(function(){
+			var $toBeFocused = $ConsoleElement.
+				children(".jsconsole_input.jsconsole_active").
+				children(".jsconsole_line");
+			$toBeFocused.focus();
 		});
 
 		var addLine = function(){
@@ -53,9 +106,12 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 		var commandsHandler = function(){
 			var text = $ConsoleElement.children(".jsconsole_input.jsconsole_active").
 				children(".jsconsole_line").text();
+			historyIndex = 0;
+			currentIndex = null;
+			history.unshift(text);
 			var cmds = text.split(";");
 			$.each(cmds, function(){
-				var cmd = this.split(/\s+/, 1);
+				var cmd = this.split(" ", 1);
 				var args = "";
 				if(this.indexOf(" ") > 0){
 					args = this.substring(this.indexOf(" ")).trim();
@@ -74,37 +130,122 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 
 		this.addOutput = function(text){
 			var $output = $("<div class='jsconsole_output'></div>");
-			$output.text(text);
+			var $line = $("<div class='jsconsole_line'></div>")
+			$line.text(text);
+			$output.append($line);
 			$ConsoleElement.append($output);
 		}
 
 		this.addError = function(text){
 			var $output = $("<div class='jsconsole_error'></div>");
-			$output.text(text);
+			var $line = $("<div class='jsconsole_line'></div>")
+			$line.text(text);
+			$output.append($line);
 			$ConsoleElement.append($output);
 		}
 
 
 		this.addWarning = function(text){
 			var $output = $("<div class='jsconsole_warning'></div>");
-			$output.text(text);
+			var $line = $("<div class='jsconsole_line'></div>")
+			$line.text(text);
+			$output.append($line);
 			$ConsoleElement.append($output);
+		}
+
+		this.backgroundColor = function(color){
+			if(color === undefined)
+				return background_color;
+			background_color = color;
+			return this;
+		}
+
+		this.inputColor = function(color){
+			if(color === undefined)
+				return input_color;
+			input_color = color;
+			return this;
+		}
+
+		this.outputColor = function(color){
+			if(color === undefined)
+				return output_color;
+			output_color = color;
+			return this;
+		}
+
+		this.errorColor = function(color){
+			if(color === undefined)
+				return error_color;
+			error_color = color;
+			return this;
+		}
+
+		this.warningColor = function(color){
+			if(color === undefined)
+				return warning_color;
+			warning_color = color;
+			return this;
+		}
+
+		this.dirColor = function(color){
+			if(color === undefined)
+				return dir_color;
+			dir_color = color;
+			return this;
+		}
+
+		this.applyColorChanges = function(){
+			styles();
+			return this;
+		}
+
+		this.executeCommands = function(){
+			$.each(arguments, function(){
+				var $line = $(".jsconsole_input.jsconsole_active .jsconsole_line");
+				$line.text(this);
+				$line.trigger({
+					type: "keydown",
+					which: 13
+				});
+			});
+		}
+
+		function setEndOfContenteditable(contentEditableElement){
+			var range,selection;
+			if(document.createRange)//Firefox, Chrome, Opera, Safari, IE 9+
+			{
+				range = document.createRange();//Create a range (a range is a like the selection but invisible)
+				range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
+				range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+				selection = window.getSelection();//get the selection object (allows you to change selection)
+				selection.removeAllRanges();//remove any selections already made
+				selection.addRange(range);//make the range you have just created the visible selection
+			}
+			else if(document.selection)//IE 8 and lower
+			{ 
+				range = document.body.createTextRange();//Create a range (a range is a like the selection but invisible)
+				range.moveToElementText(contentEditableElement);//Select the entire contents of the element with the range
+				range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+				range.select();//Select the range (make it the visible selection
+			}
 		}
 
 		addLine();
 		this.addCommand("clear", function(){
-			// $ConsoleElement.children(":not(.jsconsole_input.jsconsole_active)").remove();
 			$ConsoleElement.children().remove();
 		});
 	}
 
-	var styles = function(background_color, input_color, output_color, error_color, warning_color, dir_color){
+	var styles = function(){
 
-		var $style = $("<style id='jsconsole'></style>");
+		$("#jsconsoleStyleID").remove();
+		var $style = $("<style id='jsconsoleStyleID'></style>");
 
 		var input = function(){
 			var styleText = ".jsconsole_input{";
 			styleText += "color:" + input_color + ";";
+			// styleText += "z-index:0;";
 			styleText += "outline:none;";
 			styleText += "display:block;";
 			styleText += "}";
@@ -133,8 +274,8 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 		var dir = function(){
 			var styleText = ".jsconsole_directory{";
 			styleText += "color:" + dir_color + ";";
-			styleText += "padding-right:4px;";
-			styleText += "padding-left:4px;";
+			styleText += "padding-right:8px;";
+			// styleText += "padding-left:4px;";
 			styleText += "display:inline;"
 			styleText += "}";
 			$style.append(styleText);
@@ -188,5 +329,5 @@ if (typeof jQuery === 'undefined') { throw new Error('JSConsole requires jQuery'
 		$("head").append($style);
 	}
 
-	styles("#2f0b24", "white", "green", "red", "orange", "blue");
+	styles();
 }(jQuery, window));
