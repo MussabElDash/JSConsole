@@ -5,7 +5,7 @@ A Console JavaScript library
 This Library is to simulate a Console on the browser
 
 ## Usage
-use the following javascript code to inject the console in a div
+use the following javascript code to inject the console in a div and gets the JSConsole
 
 ```var jsconsole = JSConsole("divID");```
 
