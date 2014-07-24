@@ -44,9 +44,8 @@ and the following methods are used to manipulate the JSConsole texts
 
 **in the javascript**
 
-```JSConsole("console")```
-
 ```
+JSConsole("console")
 jsconsole.addCommand("greet", function(name){
 	this.addOutput("Hello " + name);
 	this.addError("Hello " + name);
