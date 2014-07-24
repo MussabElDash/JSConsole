@@ -46,7 +46,8 @@ and the following methods are used to manipulate the JSConsole texts
 
 ```JSConsole("console")```
 
-```jsconsole.addCommand("greet", function(name){
+```
+jsconsole.addCommand("greet", function(name){
 	this.addOutput("Hello " + name);
 	this.addError("Hello " + name);
 	this.addWarning("Hello " + name);
@@ -57,7 +58,8 @@ jsconsole.addCommand("background", function(color){
 });
 
 jsconsole.executeCommands("greet Mussab",
-	"greet Mussab ElDash", "greet GitHub user");```
+	"greet Mussab ElDash", "greet GitHub user");
+```
 
 ---
 
