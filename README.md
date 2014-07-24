@@ -60,6 +60,8 @@ jsconsole.executeCommands("greet Mussab",
 	"greet Mussab ElDash", "greet GitHub user");
 ```
 
+###[Demo](http://mussabeldash.github.io/JSConsole/)
+
 ---
 
 ## Requirments:
